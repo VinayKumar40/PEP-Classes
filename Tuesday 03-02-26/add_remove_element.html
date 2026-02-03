@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Favorite Food</title>
+</head>
+<body>
+
+<script>
+    // create ul
+    let ul = document.createElement("ul");
+
+    // create li items
+    let food1 = document.createElement("li");
+    food1.textContent = "Kalakand";
+
+    let food2 = document.createElement("li");
+    food2.textContent = "Ghewar";
+
+    let food3 = document.createElement("li");
+    food3.textContent = "Aloo Paratha";
+
+    // add li to ul
+    ul.appendChild(food1);
+    ul.appendChild(food2);
+    ul.appendChild(food3);
+
+    // add ul to body
+    document.body.appendChild(ul);
+
+    // edit 1st food item
+    ul.firstElementChild.textContent = "Churma";
+
+    // remove last item
+    ul.removeChild(ul.lastElementChild);
+</script>
+
+</body>
+</html>
