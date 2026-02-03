@@ -1,0 +1,146 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive User Profile Editor</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: #dcdcdc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+        }
+
+        .card {
+            background-color: #ff7700;
+            border-radius: 12px;
+            padding: 25px;
+            width: 350px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+
+        #display-pic {
+            width: 150px; 
+            height: 150px;
+            border-radius: 8px; 
+            object-fit: cover; 
+            margin-bottom: 15px;
+        }
+
+        h2 { margin: 10px 0; color: #000; }
+        p { color: #000; font-weight: bold; }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <img id="display-pic" src="https://i.imgur.com/8K0p3Xm.png" alt="Profile Picture">
+        <h2 id="display-name">Gentlemen Cadet 😁</h2>
+        <p id="display-bio">Bio 🙄</p>
+    </div>
+
+    <div class="card">
+        <div class="input-group">
+            <label>Update Name:</label>
+            <input type="text" id="input-name" placeholder="Enter New Name">
+        </div>
+
+        <div class="input-group">
+            <label>Update Designantion/Bio:</label>
+            <input type="text" id="input-bio" placeholder="Enter New Bio">
+        </div>
+
+        <div class="input-group">
+            <label>Update Profile Picture URL:</label>
+            <input type="text" id="input-url" placeholder="Paste Image Link Here">
+        </div>
+
+        <button id="update-btn">Update Profile</button>
+    </div>
+
+    <script>
+        // Hooking into the HTML elements
+        const updateBtn = document.getElementById('update-btn');
+
+
+        const nameInput = document.getElementById('input-name');
+        const bioInput = document.getElementById('input-bio');
+        const urlInput = document.getElementById('input-url');
+
+        const displayName = document.getElementById('display-name');
+        const displayBio = document.getElementById('display-bio');
+        const displayPic = document.getElementById('display-pic');
+
+        // Event Listener: Running the function when the button is clicked
+        updateBtn.addEventListener('click', function() {
+            
+            
+            // Only update if the user actually typed something (trim removes empty spaces)
+
+            if (nameInput.value.trim() !== "") // this condition checks whether the value is entered or not
+            {
+                displayName.textContent = nameInput.value;
+            }
+
+            if (bioInput.value.trim() !== "") 
+            {
+                displayBio.textContent = bioInput.value;  // If, everything is filled it displays in the upper box
+            }
+
+            if (urlInput.value.trim() !== "")
+            {
+                displayPic.src = urlInput.value;
+            }
+
+            // Clear the input boxes after getting updated by the user
+            nameInput.value = "";
+            bioInput.value = "";
+            urlInput.value = "";
+        });
+    </script>
+
+</body>
+</html>
