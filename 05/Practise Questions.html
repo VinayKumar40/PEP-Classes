@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Practical Questions - Vinay</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; transition: 0.3s; }
+        .dark-mode { background-color: #2c3e50; color: white; }
+        .question-box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+        code { background: #f4f4f4; padding: 2px 5px; border-radius: 4px; color: #d63384; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; color: black;}
+        .dark-mode pre { background: #34495e; color: #ecf0f1; }
+        button { padding: 8px 15px; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <h1>JavaScript Practical Tasks</h1>
+
+    <div class="question-box">
+        <h3>PART A: CLOSURES (Check Console for Output)</h3>
+        <p>1. Counter / 2. Bank Account / 3. Once Function / 4. Multiplier / 5. Password Checker</p>
+    </div>
+
+    <div class="question-box">
+        <h3>6. Button Click Counter</h3>
+        <button id="counterBtn">Click me</button>
+        <p>Count: <span id="countDisplay">0</span></p>
+    </div>
+
+    <div class="question-box">
+        <h3>7. Light/Dark Mode Toggle</h3>
+        <button id="themeToggle">Switch Theme</button>
+    </div>
+
+    <div class="question-box">
+        <h3>8. Form Validation</h3>
+        <form id="regForm">
+            <input type="text" id="userName" placeholder="Name"><br>
+            <input type="text" id="userEmail" placeholder="Email"><br>
+            <input type="password" id="userPass" placeholder="Password (min 6 chars)"><br>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <div class="question-box">
+        <h3>9. Click Once Button</h3>
+        <button id="onceBtn">I work only once</button>
+    </div>
+
+    <div class="question-box">
+        <h3>10. Show/Hide Password</h3>
+        <input type="password" id="passInput" value="secret123">
+        <label><input type="checkbox" id="showPass"> Show Password</label>
+    </div>
+
+    <div class="question-box">
+        <h3>11. List Click Text</h3>
+        <ul id="myList">
+            <li>JavaScript</li>
+            <li>React</li>
+            <li>Node.js</li>
+        </ul>
+    </div>
+
+    <script>
+        /* ==========================================
+           PART A: CLOSURES
+           ========================================== */
+
+        // 1. Counter Closure
+        function createCounter() {
+            let count = 0;
+            return {
+                increment: () => ++count,
+                decrement: () => --count,
+                reset: () => count = 0
+            };
+        }
+        const counter = createCounter();
+
+        // 2. Private Bank Account
+        function createBankAccount(initial) {
+            let balance = initial;
+            return {
+                deposit: (amt) => balance += amt,
+                withdraw: (amt) => amt <= balance ? balance -= amt : "Low funds",
+                getBalance: () => balance
+            };
+        }
+
+        // 3. Once Function
+        function once(fn) {
+            let done = false;
+            return (...args) => {
+                if (!done) { done = true; return fn(...args); }
+                return "Blocked";
+            };
+        }
+
+        // 4. Multiplier Factory
+        const multiplyBy = (x) => (y) => x * y;
+
+        // 5. Password Checker
+        const createPassword = (saved) => (input) => input === saved;
+
+        /* ==========================================
+           PART B: EVENT LISTENERS
+           ========================================== */
+
+        // 6. Click Counter
+        const countBtn = document.getElementById('counterBtn');
+        const countDisp = document.getElementById('countDisplay');
+        let c = 0;
+        countBtn.addEventListener('click', () => countDisp.innerText = ++c);
+
+        // 7. Theme Toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        // 8. Form Validation
+        document.getElementById('regForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            const pass = document.getElementById('userPass').value;
+
+            if (name && email.includes('@') && pass.length >= 6) {
+                alert("Success!");
+            } else {
+                alert("Invalid Inputs!");
+            }
+        });
+
+        // 9. Work Once
+        document.getElementById('onceBtn').addEventListener('click', function() {
+            alert("This will not happen again.");
+            this.disabled = true;
+        }, { once: true });
+
+        // 10. Show/Hide Password
+        const pIn = document.getElementById('passInput');
+        document.getElementById('showPass').addEventListener('change', (e) => {
+            pIn.type = e.target.checked ? 'text' : 'password';
+        });
+
+        // 11. List Text
+        document.getElementById('myList').addEventListener('click', (e) => {
+            if (e.target.tagName === 'LI') alert(e.target.innerText);
+        });
+
+    </script>
+</body>
+</html>
