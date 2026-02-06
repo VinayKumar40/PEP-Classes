@@ -1,0 +1,356 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyCast Pro</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2.5rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .search-group {
+            display: flex;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 12px 15px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        input::placeholder { color: rgba(255, 255, 255, 0.6); }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover { background: #2563eb; transform: scale(1.02); }
+        
+        .weather-content { 
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .city-name { font-size: 1.8rem; font-weight: 700; margin-bottom: 4px; }
+        .time-chip {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            color: #cbd5e1;
+            letter-spacing: 1px;
+        }
+        .temp-main {
+            font-size: 5.5rem;
+            font-weight: 900;
+            margin: 10px 0;
+            background: linear-gradient(to bottom, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .grid-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 15px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .stat-card span { display: block; font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px; font-weight: 700; }
+        .stat-card b { font-size: 1.3rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="search-group">
+        <input type="text" id="cityInput" placeholder="Enter city name..." onkeydown="if(event.key==='Enter') getWeather()">
+        <button onclick="getWeather()">Search</button>
+    </div>
+
+    <div id="weatherResult" class="weather-content" style="display:none;">
+        <h2 class="city-name" id="locationName"></h2>
+        <div class="time-chip" id="currentTime"></div>
+        <div class="temp-main" id="temperature"></div>
+        
+        <div class="grid-stats">
+            <div class="stat-card">
+                <span>🌬️ Wind</span>
+                <b id="windSpeed"></b> <small>km/h</small>
+            </div>
+            <div class="stat-card">
+                <span>💧 Humidity</span>
+                <b id="humidity"></b> <small>%</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let timerInterval = null;
+    let currentTz = "UTC";
+
+    async function getWeather() {
+        const city = document.getElementById('cityInput').value;
+        if (!city) return;
+
+        try {
+            // Updated geocoding URL to handle broader searches better
+            const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=5&language=en&format=json`);
+            const geoData = await geoRes.json();
+            
+            if (!geoData.results || geoData.results.length === 0) throw new Error("Location not found");
+            
+            // Prioritize results that are 'PPLA' (seat of a first-order admin division) or cities
+            const bestMatch = geoData.results.find(res => res.feature_code && (res.feature_code.startsWith('PPL') || res.feature_code === 'ADM1')) || geoData.results[0];
+            
+            const { latitude, longitude, name, country, timezone } = bestMatch;
+            currentTz = timezone;
+
+            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&timezone=auto`);
+            const weatherData = await weatherRes.json();
+
+            const resultDiv = document.getElementById('weatherResult');
+            resultDiv.style.display = 'block';
+            
+            document.getElementById('locationName').innerText = `${name}, ${country}`;
+            document.getElementById('temperature').innerText = `${Math.round(weatherData.current.temperature_2m)}°`;
+            document.getElementById('windSpeed').innerText = weatherData.current.wind_speed_10m;
+            document.getElementById('humidity').innerText = weatherData.current.relative_humidity_2m;
+
+            startClock();
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    function startClock() {
+        if (timerInterval) clearInterval(timerInterval);
+        const updateTime = () => {
+            const now = new Date();
+            document.getElementById('currentTime').innerText = now.toLocaleTimeString('en-GB', { 
+                timeZone: currentTz,
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+        };
+        updateTime();
+        timerInterval = setInterval(updateTime, 1000);
+    }
+</script>
+
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyCast Pro | Dynamic</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        /* Default Background */
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: #0f172a; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            padding: 20px;
+            transition: background 1.5s ease-in-out; /* Smooth color transition */
+        }
+
+        /* Dynamic Themes */
+        .theme-morning { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #4a4a4a; }
+        .theme-day { background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%); color: white; }
+        .theme-evening { background: linear-gradient(135deg, #f97316 0%, #701a75 100%); color: white; }
+        .theme-night { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: white; }
+
+        .container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2.5rem;
+            border-radius: 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .search-group {
+            display: flex;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+
+        input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 12px;
+            color: inherit;
+            outline: none;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.3);
+            color: inherit;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
+
+        .temp-main { font-size: 5rem; font-weight: 900; margin: 10px 0; }
+        .time-chip { font-family: monospace; font-size: 1.1rem; margin-bottom: 10px; opacity: 0.8; }
+        .grid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .stat-card { background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 15px; }
+    </style>
+</head>
+<body id="bodyTag">
+
+<div class="container">
+    <div class="search-group">
+        <input type="text" id="cityInput" placeholder="Enter city (e.g. Alwar)">
+        <button onclick="getWeather()">Search</button>
+    </div>
+
+    <div id="weatherResult" style="display:none;">
+        <h2 id="locationName" style="font-size: 1.8rem;"></h2>
+        <div class="time-chip" id="currentTime"></div>
+        <div class="temp-main" id="temperature"></div>
+        <p id="conditionText" style="margin-bottom: 20px; font-weight: 600; text-transform: uppercase;"></p>
+        
+        <div class="grid-stats">
+            <div class="stat-card"><span>🌬️ Wind</span><br><b id="windSpeed"></b> km/h</div>
+            <div class="stat-card"><span>💧 Humidity</span><br><b id="humidity"></b> %</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let timerInterval = null;
+    let currentTz = "UTC";
+
+    async function getWeather() {
+        const city = document.getElementById('cityInput').value;
+        if (!city) return;
+
+        try {
+            const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&format=json`);
+            const geoData = await geoRes.json();
+            if (!geoData.results) throw new Error("City not found");
+            
+            const { latitude, longitude, name, country, timezone } = geoData.results[0];
+            currentTz = timezone;
+
+            // Added daily sunrise and sunset to the fetch request
+            const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&daily=sunrise,sunset&timezone=auto`);
+            const data = await weatherRes.json();
+
+            updateUI(data, name, country);
+            updateBackground(data);
+            startClock();
+        } catch (error) { alert(error.message); }
+    }
+
+    function updateUI(data, name, country) {
+        document.getElementById('weatherResult').style.display = 'block';
+        document.getElementById('locationName').innerText = `${name}, ${country}`;
+        document.getElementById('temperature').innerText = `${Math.round(data.current.temperature_2m)}°`;
+        document.getElementById('windSpeed').innerText = data.current.wind_speed_10m;
+        document.getElementById('humidity').innerText = data.current.relative_humidity_2m;
+    }
+
+    function updateBackground(data) {
+        const body = document.getElementById('bodyTag');
+        const now = new Date().toLocaleString("en-US", { timeZone: currentTz });
+        const localTime = new Date(now);
+        
+        const sunrise = new Date(data.daily.sunrise[0]);
+        const sunset = new Date(data.daily.sunset[0]);
+
+        // Remove all previous themes
+        body.classList.remove('theme-morning', 'theme-day', 'theme-evening', 'theme-night');
+
+        // Logic to determine theme
+        const hour = localTime.getHours();
+        
+        if (localTime >= sunrise && localTime < new Date(sunrise.getTime() + 2 * 60 * 60 * 1000)) {
+            body.classList.add('theme-morning');
+            document.getElementById('conditionText').innerText = "Sunrise 🌅";
+        } else if (localTime >= sunrise && localTime < sunset) {
+            body.classList.add('theme-day');
+            document.getElementById('conditionText').innerText = "Sunny Day ☀️";
+        } else if (localTime >= sunset && localTime < new Date(sunset.getTime() + 2 * 60 * 60 * 1000)) {
+            body.classList.add('theme-evening');
+            document.getElementById('conditionText').innerText = "Sunset 🌇";
+        } else {
+            body.classList.add('theme-night');
+            document.getElementById('conditionText').innerText = "Clear Night 🌙";
+        }
+    }
+
+    function startClock() {
+        if (timerInterval) clearInterval(timerInterval);
+        const updateTime = () => {
+            const now = new Date();
+            document.getElementById('currentTime').innerText = now.toLocaleTimeString('en-GB', { 
+                timeZone: currentTz, hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            });
+        };
+        updateTime();
+        timerInterval = setInterval(updateTime, 1000);
+    }
+</script>
+</body>
+</html>

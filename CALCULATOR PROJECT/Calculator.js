@@ -1,8 +1,7 @@
 const heading = document.createElement("h2");
-heading.innerText = "Simple Calculator";
+heading.textContent = "Simple Calculator (DOM Based)";
 document.body.appendChild(heading);
 
-(try_catch_finally)
 const input1 = document.createElement("input");
 input1.type = "number";
 input1.placeholder = "Enter first number";
@@ -10,7 +9,6 @@ document.body.appendChild(input1);
 
 document.body.appendChild(document.createElement("br"));
 document.body.appendChild(document.createElement("br"));
-
 
 const input2 = document.createElement("input");
 input2.type = "number";
@@ -20,47 +18,44 @@ document.body.appendChild(input2);
 document.body.appendChild(document.createElement("br"));
 document.body.appendChild(document.createElement("br"));
 
-
-
 const result = document.createElement("h3");
-result.innerText = "Result: ";
+result.textContent = "Result: ";
 document.body.appendChild(result);
 
-function getValues() {
-    const a = Number(input1.value);
-    const b = Number(input2.value);
-    return { a, b };
+function getNumbers() {
+    return {
+        a: Number(input1.value),
+        b: Number(input2.value)
+    };
 }
 
 function add() {
-    const { a, b } = getValues();
-    result.innerText = "Result: " + (a + b);
+    const { a, b } = getNumbers();
+    result.textContent = "Result: " + (a + b);
 }
 
 function subtract() {
-    const { a, b } = getValues();
-    result.innerText = "Result: " + (a - b);
+    const { a, b } = getNumbers();
+    result.textContent = "Result: " + (a - b);
 }
 
 function multiply() {
-    const { a, b } = getValues();
-    result.innerText = "Result: " + (a * b);
+    const { a, b } = getNumbers();
+    result.textContent = "Result: " + (a * b);
 }
 
 function divide() {
-    const { a, b } = getValues();
+    const { a, b } = getNumbers();
     if (b === 0) {
-        result.innerText = "Result: Cannot divide by zero";
+        result.textContent = "Result: Cannot divide by zero";
     } else {
-        result.innerText = "Result: " + (a / b);
+        result.textContent = "Result: " + (a / b);
     }
 }
 
-
-(try_catch_finally)
 function createButton(text, handler) {
     const btn = document.createElement("button");
-    btn.innerText = text;
+    btn.textContent = text;
     btn.addEventListener("click", handler);
     document.body.appendChild(btn);
 }
