@@ -10,25 +10,23 @@
 // }
 
 
+// function getMaggie() {
+//     return new Promise((resolve) => {
+//         setTimeout(() => {
+//             resolve("Maggie is ready");
+//         }, 2000);
+//     });
+// }
 
+// async function eatMaggie() {
+//     console.log("Waiting");
+//     try {
+//         let result = await getMaggie();
+//         console.log(result);
+//     }catch (error){
+//         console.log("error:" , error);
+//     }
+//     console.log("Done Eating")
+// }
+// eatMaggie();
 
-
-function getMaggie() {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            resolve("Maggie is ready");
-        }, 2000);
-    });
-}
-
-async function eatMaggie() {
-    console.log("Waiting");
-    try {
-        let result = await getMaggie();
-        console.log(result);
-    }catch (error){
-        console.log("error:" , error);
-    }
-    console.log("Done Eating")
-}
-eatMaggie();
