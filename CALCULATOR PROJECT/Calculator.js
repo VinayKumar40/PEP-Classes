@@ -2,7 +2,7 @@ const heading = document.createElement("h2");
 heading.innerText = "Simple Calculator";
 document.body.appendChild(heading);
 
-
+(try_catch_finally)
 const input1 = document.createElement("input");
 input1.type = "number";
 input1.placeholder = "Enter first number";
@@ -21,11 +21,10 @@ document.body.appendChild(document.createElement("br"));
 document.body.appendChild(document.createElement("br"));
 
 
+
 const result = document.createElement("h3");
 result.innerText = "Result: ";
 document.body.appendChild(result);
-
-
 
 function getValues() {
     const a = Number(input1.value);
@@ -58,7 +57,7 @@ function divide() {
 }
 
 
-
+(try_catch_finally)
 function createButton(text, handler) {
     const btn = document.createElement("button");
     btn.innerText = text;
